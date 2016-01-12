@@ -1,17 +1,27 @@
 package app;
 
+import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import protocol.TBGPProtocolCallback;
+import tokenizer.TBGPCommand;
+import tokenizer.TBGPMessage;
 
 public class GameRoom {
+	
+	private ConcurrentHashMap<String,TBGPProtocolCallback> players;
+	
+	private String name;
 	
 	private GameProtocol currentGame = null;
 	
 	private static final Logger logger = Logger.getLogger("edu.spl.reactor");
 
-	public GameRoom(GameProtocol currentGame) {
-		this.currentGame = currentGame;
+	public GameRoom(String name) {
+		players = new ConcurrentHashMap<String,TBGPProtocolCallback>();
+		this.name = name;
 	}
-
+	
 	public synchronized boolean startGame(GameProtocol game) {
 		if(!inSession()) {
 			this.currentGame = game;
@@ -25,5 +35,34 @@ public class GameRoom {
 	
 	public boolean inSession() {
 		return currentGame != null;
+	}
+
+	public void addPlayer(String nickname, TBGPProtocolCallback callback) {
+		broadcast(nickname + " joined the room");
+		players.put(nickname, callback);
+	}
+	
+	public void broadcast(String msg) {
+		players.forEach((k,v) -> {
+			
+			try {
+				v.sendMessage(new TBGPMessage(msg,TBGPCommand.USRMSG));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		});
+	}
+	
+	public boolean quit(String nickname) {
+		if(!inSession()) {
+			players.remove(nickname);
+			broadcast(nickname + " left the room");
+			logger.info(nickname + " left the room");
+			return true;
+		} else {
+			logger.info("Unable to leave room - game in session");
+			return false;
+		}
 	}
 }

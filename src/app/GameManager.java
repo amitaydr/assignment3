@@ -56,4 +56,29 @@ public class GameManager {
 			return null;
 		}
 	}
+	
+	public boolean exit() {
+		//TODO
+		return false;
+	}
+	
+	public boolean joinGameRoom(String roomName, String nickname) {
+		if(gamerooms.containsKey(roomName)) {
+			GameRoom gameRoom = gamerooms.get(roomName);
+			if(gameRoom.inSession()) {
+				logger.info(nickname + " was unable to join game room " + " - already in session");
+				return false;
+			} else {
+				gameRoom.addPlayer(nickname,players.get(nickname));
+				logger.info(nickname + " joined " + roomName + " game room");
+				return true;
+			}
+		} else {
+			GameRoom gameRoom = gamerooms.get(roomName);
+			gameRoom.addPlayer(nickname,players.get(nickname));
+			gamerooms.put(roomName, new GameRoom(roomName));
+			logger.info(nickname + " joined " + roomName + " game room");
+			return true;
+		}
+	}
 }
