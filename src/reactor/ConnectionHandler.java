@@ -1,6 +1,7 @@
 package reactor;
 
 import java.nio.channels.SocketChannel;
+import java.nio.charset.CharacterCodingException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ClosedChannelException;
 import java.nio.ByteBuffer;
@@ -207,7 +208,7 @@ public class ConnectionHandler<T> {
 		return _callback;
 	}
 
-	public void addOutMessage(T msg) {
+	public void addOutMessage(T msg) throws CharacterCodingException {
 		addOutData (_tokenizer.getBytesForMessage(msg));
 		
 	}

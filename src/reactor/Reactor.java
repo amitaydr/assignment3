@@ -204,7 +204,7 @@ public class Reactor<T> implements Runnable {
             int port = Integer.parseInt(args[0]);
             int poolSize = Integer.parseInt(args[1]);
 
-            Reactor<TBGPMessage> reactor = startEchoServer(port, poolSize);
+            Reactor<TBGPMessage> reactor = startTBGPServer(port, poolSize);
 
             Thread thread = new Thread(reactor);
             thread.start();
@@ -215,7 +215,7 @@ public class Reactor<T> implements Runnable {
         }
     }
 
-    public static Reactor<TBGPMessage> startEchoServer(int port, int poolSize) {
+    public static Reactor<TBGPMessage> startTBGPServer(int port, int poolSize) {
         ServerProtocolFactory<TBGPMessage> protocolMaker = new ServerProtocolFactory<TBGPMessage>() {
             public AsyncServerProtocol<TBGPMessage> create() {
                 return new TBGP();
