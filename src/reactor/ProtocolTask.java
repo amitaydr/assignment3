@@ -26,11 +26,12 @@ public class ProtocolTask<T> implements Runnable {
 	// we synchronize on ourselves, in case we are executed by several threads
 	// from the thread pool.
 	public synchronized void run() {
+		//TODO need to adjust to callbacks
       // go over all complete messages and process them.
       while (_tokenizer.hasMessage()) {
          T msg = _tokenizer.nextMessage();
-          this._protocol.processMessage(msg, null);
-      /*   if (response != null) {
+          this._protocol.processMessage(msg, _handler.getCallbackProtocol());
+      /*   if (response != null) {      //the old code
             try {
                ByteBuffer bytes = _tokenizer.getBytesForMessage(response);
                this._handler.addOutData(bytes);

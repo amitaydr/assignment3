@@ -30,6 +30,8 @@ public class Reactor<T> implements Runnable {
     private final ServerProtocolFactory<T> _protocolFactory;
 
     private final TokenizerFactory<T> _tokenizerFactory;
+    
+    private final ProtocolCallbackFactory<T> _callbackFactory;
 
     private volatile boolean _shouldRun = true;
 
@@ -44,11 +46,12 @@ public class Reactor<T> implements Runnable {
      * @param tokenizer the tokenizer factory to work with
      * @throws IOException if some I/O problems arise during connection
      */
-    public Reactor(int port, int poolSize, ServerProtocolFactory<T> protocol, TokenizerFactory<T> tokenizer) {
+    public Reactor(int port, int poolSize, ServerProtocolFactory<T> protocol, TokenizerFactory<T> tokenizer, ProtocolCallbackFactory<T> callbackFac) {
         _port = port;
         _poolSize = poolSize;
         _protocolFactory = protocol;
         _tokenizerFactory = tokenizer;
+        _callbackFactory = callbackFac;
     }
 
     /**
@@ -95,7 +98,7 @@ public class Reactor<T> implements Runnable {
             return;
         }
 
-        _data = new ReactorData<T>(executor, selector, _protocolFactory, _tokenizerFactory);
+        _data = new ReactorData<T>(executor, selector, _protocolFactory, _tokenizerFactory, _callbackFactory);
         ConnectionAcceptor<T> connectionAcceptor = new ConnectionAcceptor<T>(ssChannel, _data);
 
         // Bind the server socket channel to the selector, with the new
@@ -201,7 +204,7 @@ public class Reactor<T> implements Runnable {
             int port = Integer.parseInt(args[0]);
             int poolSize = Integer.parseInt(args[1]);
 
-            Reactor<StringMessage> reactor = startEchoServer(port, poolSize);
+            Reactor<TBGPMessage> reactor = startEchoServer(port, poolSize);
 
             Thread thread = new Thread(reactor);
             thread.start();
@@ -212,22 +215,28 @@ public class Reactor<T> implements Runnable {
         }
     }
 
-    public static Reactor<StringMessage> startEchoServer(int port, int poolSize) {
-        ServerProtocolFactory<StringMessage> protocolMaker = new ServerProtocolFactory<StringMessage>() {
-            public AsyncServerProtocol<StringMessage> create() {
-                return new EchoProtocol();
+    public static Reactor<TBGPMessage> startEchoServer(int port, int poolSize) {
+        ServerProtocolFactory<TBGPMessage> protocolMaker = new ServerProtocolFactory<TBGPMessage>() {
+            public AsyncServerProtocol<TBGPMessage> create() {
+                return new TBGP();
             }
         };
 
 
         final Charset charset = Charset.forName("UTF-8");
-        TokenizerFactory<StringMessage> tokenizerMaker = new TokenizerFactory<StringMessage>() {
-            public MessageTokenizer<StringMessage> create() {
-                return new FixedSeparatorMessageTokenizer("\n", charset);
+        TokenizerFactory<TBGPMessage> tokenizerMaker = new TokenizerFactory<TBGPMessage>() {
+            public MessageTokenizer<TBGPMessage> create() {
+                return new TBGPMessageTokenizer();
+            }
+        };
+        
+        ProtocolCallbackFactory<TBGPMessage> callbackMaker = new ProtocolCallbackFactory<TBGPMessage>() {
+        	public ProtocolCallback<TBGPMessage> create(ConnectionHandler<TBGPMessage> h) {
+                return new TBGPProtocolCallback(h);
             }
         };
 
-        Reactor<StringMessage> reactor = new Reactor<StringMessage>(port, poolSize, protocolMaker, tokenizerMaker);
+        Reactor<TBGPMessage> reactor = new Reactor<TBGPMessage>(port, poolSize, protocolMaker, tokenizerMaker, callbackMaker);
         return reactor;
     }
 }

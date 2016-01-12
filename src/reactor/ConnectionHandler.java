@@ -34,6 +34,8 @@ public class ConnectionHandler<T> {
 
 	private ProtocolTask<T> _task = null;
 
+	private ProtocolCallback<T> _callback;
+
 	/**
 	 * Creates a new ConnectionHandler object
 	 * 
@@ -53,6 +55,7 @@ public class ConnectionHandler<T> {
 	// make sure 'this' does not escape b4 the object is fully constructed!
 	private void initialize() {
 		_skey.attach(this);
+		_callback =_data.getProtocolCallbackFactory().create(this);
 		_task = new ProtocolTask<T>(_protocol, _tokenizer, this);
 	}
 
@@ -198,6 +201,15 @@ public class ConnectionHandler<T> {
 	public void switchToWriteOnlyMode() {
 		_skey.interestOps(SelectionKey.OP_WRITE);
 		_data.getSelector().wakeup();
+	}
+
+	public ProtocolCallback<T> getCallbackProtocol() {
+		return _callback;
+	}
+
+	public void addOutMessage(T msg) {
+		addOutData (_tokenizer.getBytesForMessage(msg));
+		
 	}
 
 }
