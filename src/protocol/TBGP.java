@@ -1,17 +1,52 @@
 package protocol;
 
-import tokenizer.StringMessage;
+import java.io.IOException;
 
-public abstract class TBGP implements AsyncServerProtocol<StringMessage> {
+import app.GameManager;
+import app.GameRoom;
+import tokenizer.TBGPCommand;
+import tokenizer.TBGPMessage;
+
+public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
+	private GameRoom gameRoom;
+	private String nickname;
 
 	@Override
-	public void processMessage(StringMessage msg, ProtocolCallback<StringMessage> callback) {
-		// TODO Auto-generated method stub
-		
+	public void processMessage(TBGPMessage msg, ProtocolCallback<TBGPMessage> callback) {
+		TBGPCommand command = msg.getCommand();
+		switch (command){
+			case NICK :
+				if (nickname != null){
+					boolean ans = GameManager.getInstance().acquireNickname(msg.getMessage(), (TBGPProtocolCallback) callback);
+					TBGPMessage result = new TBGPMessage ("NICK " +(ans? "ACCEPTED":"REJECTED"), TBGPCommand.SYSMSG);
+					if (ans) nickname = msg.getMessage();
+					try {callback.sendMessage(result);
+					} catch (IOException e) {e.printStackTrace();}
+				}else{
+					TBGPMessage result = new TBGPMessage ("NICK REJECTED This player alrady has a nickname- " + nickname, TBGPCommand.SYSMSG);
+				}
+			case JOIN:
+				break;
+			case LISTGAMES:
+				break;
+			case MSG:
+				break;
+			case QUIT:
+				break;
+			case SELECTRESP:
+				break;
+			case STARTGAME:
+				break;
+			case TXTRESP:
+				break;
+			default:
+				break;
+			}
+			
 	}
 
 	@Override
-	public boolean isEnd(StringMessage msg) {
+	public boolean isEnd(TBGPMessage msg) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -27,6 +62,7 @@ public abstract class TBGP implements AsyncServerProtocol<StringMessage> {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 
 }

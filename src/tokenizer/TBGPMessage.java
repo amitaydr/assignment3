@@ -5,7 +5,7 @@ public class TBGPMessage implements Message<TBGPMessage> {
 	private String Message;
 	
 	
-	public TBGPMessage(TBGPCommand command, String message) {
+	public TBGPMessage(String message, TBGPCommand command) {
 		this.command = command;
 		Message = message;
 	}
