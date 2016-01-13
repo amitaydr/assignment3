@@ -15,7 +15,7 @@ public class GameManager {
 	
 	private final HashMap<String,GameProtocolFactory> games;
 	
-	private final String gameList;
+	private final String gameList = "";
 	
 	private static final Logger logger = Logger.getLogger("edu.spl.reactor");
 
@@ -28,16 +28,7 @@ public class GameManager {
 	private GameManager() {
 		players = new ConcurrentHashMap<String,TBGPProtocolCallback>();
 		gamerooms = new ConcurrentHashMap<String,GameRoom>();
-		gameList = new String("BLUFFER");
 		games = new HashMap<String,GameProtocolFactory>();
-		games.put("BLUFFER",new GameProtocolFactory() {
-
-			@Override
-			public GameProtocol create() {
-				return new BlufferProtocol();
-			}
-			
-		});
 	}
 	/**
 	 * Get the instance of the GameManager.
@@ -125,5 +116,16 @@ public class GameManager {
 	
 	public String listGames() {
 		return gameList;
+	}
+	
+	public void initialize(String[] gameFactories) {
+		games.put("BLUFFER", new GameProtocolFactory() {
+			
+			@Override
+			public GameProtocol create() {
+				return new BlufferProtocol(gameFactories[0]);
+			}
+			
+		});
 	}
 }

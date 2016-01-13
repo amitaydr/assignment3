@@ -9,5 +9,5 @@ public interface GameProtocol {
 		
 	public String getName();
 	
-	public void initialize();
+	public void initialize(String jsonPath);
 }

@@ -2,5 +2,5 @@ package app;
 
 public interface GameProtocolFactory {
 
-	public GameProtocol create(String jsonPath);
+	public GameProtocol create();
 }
