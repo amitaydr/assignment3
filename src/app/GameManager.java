@@ -19,7 +19,9 @@ public class GameManager {
 	private static class GameManagerInstance {
 		private static GameManager instance = new GameManager();
 	}
-	
+	/**
+	 * The GameManager constructor. Available games are added here to the games list.
+	 */
 	private GameManager() {
 		players = new ConcurrentHashMap<String,TBGPProtocolCallback>();
 		gamerooms = new ConcurrentHashMap<String,GameRoom>();
@@ -33,22 +35,34 @@ public class GameManager {
 			
 		});
 	}
-	
+	/**
+	 * Get the instance of the GameManager.
+	 * @return	the GameManager instance
+	 */
 	public static GameManager getInstance() {
 		return GameManagerInstance.instance;
 	}
-	
+	/**
+	 * Check if a nickname is available and connect to the {@link GameManager}.
+	 * @param nickname	the nickname to log on with
+	 * @param callback	the player {@link TBGPProtocolCallback}
+	 * @return	true if nickname was accepted and connection was successful and false if nickname was unavailable and connection failed.
+	 */
 	public boolean acquireNickname(String nickname, TBGPProtocolCallback callback) {
 		if(players.containsKey(nickname)) {
 			logger.info("Nickname unavailable");
 			return false;
 		} else {
-			logger.info("Nickname accepted");
+			logger.info("Nickname accepted - " + nickname + " logged on");
 			players.put(nickname, callback);
 			return true;
 		}
 	}
-	
+	/**
+	 * Searches for a game.
+	 * @param gameName	the game name to search for
+	 * @return	a {@link GameProtocolFactory) of the game protocol searched for if it exists, null otherwise
+	 */
 	public GameProtocolFactory searchGame(String gameName) {
 		if(games.containsKey(gameName)) return games.get(gameName);
 		else {
@@ -56,12 +70,24 @@ public class GameManager {
 			return null;
 		}
 	}
-	
-	public boolean exit() {
-		//TODO
-		return false;
+	/**
+	 * Deletes the player from the {@link GameManager} players list.
+	 * If no such player exists, does nothing.
+	 * @param nickname	the nickname of the player to delete
+	 */
+	public void exit(String nickname) {
+		if(players.containsKey(nickname)) {
+			players.remove(nickname);
+			logger.info(nickname + " logged off");
+		} else logger.info(nickname + " does not exist");
 	}
-	
+	/**
+	 * Join a {@link GameRoom}. If room does not exist, creates a new one and enters the player into it.
+	 * If the player wishes to join a game room in session, returns false.
+	 * @param roomName	The game room name
+	 * @param nickname	The player nickname
+	 * @return	true if the player entered the game room, false otherwise
+	 */
 	public boolean joinGameRoom(String roomName, String nickname) {
 		if(gamerooms.containsKey(roomName)) {
 			GameRoom gameRoom = gamerooms.get(roomName);
@@ -80,5 +106,14 @@ public class GameManager {
 			logger.info(nickname + " joined " + roomName + " game room");
 			return true;
 		}
+	}
+	/**
+	 * Search for a game room.
+	 * @param roomName	the game room name to search for
+	 * @return	the instance of the game room if it exists, null otherwise
+	 */
+	public GameRoom searchRoom(String roomName) {
+		if(gamerooms.containsKey(roomName)) return gamerooms.get(roomName);
+		else return null;
 	}
 }

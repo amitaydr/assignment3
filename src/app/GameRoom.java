@@ -43,15 +43,7 @@ public class GameRoom {
 	}
 	
 	public void broadcast(String msg) {
-		players.forEach((k,v) -> {
-			
-			try {
-				v.sendMessage(new TBGPMessage(msg,TBGPCommand.USRMSG));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		});
+		players.forEach((k,v) -> v.sendMessage(new TBGPMessage(msg,TBGPCommand.USRMSG)));
 	}
 	
 	public boolean quit(String nickname) {
@@ -64,5 +56,9 @@ public class GameRoom {
 			logger.info("Unable to leave room - game in session");
 			return false;
 		}
+	}
+	
+	public String toString() {
+		return name;
 	}
 }
