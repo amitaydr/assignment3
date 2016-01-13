@@ -1,6 +1,5 @@
 package app;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import protocol.TBGPProtocolCallback;
@@ -22,9 +21,11 @@ public class GameRoom {
 		this.name = name;
 	}
 	
-	public synchronized boolean startGame(GameProtocol game) {
+	public synchronized boolean startGame(String gameName) {
 		if(!inSession()) {
+			GameProtocol game = GameManager.getInstance().searchGame(gameName).create();
 			this.currentGame = game;
+			currentGame.initialize();
 			logger.info(game.getName() + " game starting");
 			return true;
 		} else {
@@ -60,5 +61,9 @@ public class GameRoom {
 	
 	public String toString() {
 		return name;
+	}
+	
+	public GameProtocol getGameProtocol() {
+		return currentGame;
 	}
 }
