@@ -23,9 +23,8 @@ public class GameRoom {
 	
 	public synchronized boolean startGame(String gameName) {
 		if(!inSession()) {
-			GameProtocol game = GameManager.getInstance().searchGame(gameName).create();
+			GameProtocol game = GameManager.getInstance().searchGame(gameName).create(this);
 			this.currentGame = game;
-			currentGame.initialize();
 			logger.info(game.getName() + " game starting");
 			return true;
 		} else {
@@ -39,18 +38,18 @@ public class GameRoom {
 	}
 
 	public void addPlayer(String nickname, TBGPProtocolCallback callback) {
-		broadcast(nickname + " joined the room");
+		broadcast(nickname + " joined the room", TBGPCommand.USRMSG);
 		players.put(nickname, callback);
 	}
 	
-	public void broadcast(String msg) {
-		players.forEach((k,v) -> v.sendMessage(new TBGPMessage(msg,TBGPCommand.USRMSG)));
+	public void broadcast(String msg, TBGPCommand command) {
+		players.forEach((k,v) -> v.sendMessage(new TBGPMessage(msg,command)));
 	}
 	
 	public boolean quit(String nickname) {
 		if(!inSession()) {
 			players.remove(nickname);
-			broadcast(nickname + " left the room");
+			broadcast(nickname + " left the room", TBGPCommand.USRMSG);
 			logger.info(nickname + " left the room");
 			return true;
 		} else {
@@ -65,5 +64,9 @@ public class GameRoom {
 	
 	public GameProtocol getGameProtocol() {
 		return currentGame;
+	}
+	
+	public int numOfPlayers() {
+		return players.size();
 	}
 }
