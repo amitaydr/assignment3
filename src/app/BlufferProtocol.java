@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 
 public class BlufferProtocol implements GameProtocol {
 
-	private final String[] questions;
+	private String[] questions = null;
 	
 	public BlufferProtocol(String jsonPath) {
 		initialize(jsonPath);
@@ -32,7 +32,7 @@ public class BlufferProtocol implements GameProtocol {
 		Gson gson = new Gson();
 		try {
 			FileReader f = new FileReader(jsonPath);
-			JsonAdapter ja = gson.fromJson(f, JsonAdapter.class);
+			questions = gson.fromJson(f, BlufferQuestion.class);
 			//TODO
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

@@ -6,25 +6,25 @@ import java.util.Map.Entry;
 
 public class BlufferQuestion {
 
-	private String question;
+	private String questionText;
 	
-	private String trueAnswer;
+	private String realAnswer;
 	
 	private HashMap<String,String> bluffs = new HashMap<String,String>();
 	
 	private String[] choices = null;
 
 	public BlufferQuestion(String question, String trueAnswer) {
-		this.question = question;
-		this.trueAnswer = trueAnswer;
+		this.questionText = question;
+		this.realAnswer = trueAnswer;
 	}
 
 	public String getQuestion() {
-		return question;
+		return questionText;
 	}
 
 	public String getTrueAnswer() {
-		return trueAnswer;
+		return realAnswer;
 	}
 	
 	public void addPlayerBluff(String nickname, String bluff) {
@@ -34,7 +34,7 @@ public class BlufferQuestion {
 	public String[] printAnswers() {
 		choices = new String[bluffs.size() + 1];
 		int role = (int)(choices.length*Math.random());
-		choices[role] = trueAnswer;
+		choices[role] = realAnswer;
 		Iterator<Entry<String, String>> it = bluffs.entrySet().iterator();
 		int i = 0;
 		while(it.hasNext()) {
