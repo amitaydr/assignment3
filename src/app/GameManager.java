@@ -122,8 +122,8 @@ public class GameManager {
 		games.put("BLUFFER", new GameProtocolFactory() {
 			
 			@Override
-			public GameProtocol create() {
-				return new BlufferProtocol(gameFactories[0]);
+			public GameProtocol create(GameRoom gameroom) {
+				return new BlufferProtocol(gameFactories[0], gameroom);
 			}
 			
 		});
