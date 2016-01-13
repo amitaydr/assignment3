@@ -8,10 +8,12 @@ import tokenizer.TBGPMessage;
 public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 	private GameRoom gameRoom;
 	private String nickname;
-	private boolean shouldClose;
+	private boolean shouldClose = false;
+	private boolean connectionTerminated = false;
 
 	@Override
 	public void processMessage(TBGPMessage msg, ProtocolCallback<TBGPMessage> callback) {
+		if (connectionTerminated) return;
 		TBGPCommand command = msg.getCommand();
 		if (command != null){
 			switch (command){
@@ -45,7 +47,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					GameManager.getInstance().listGames();
 					break;
 				case MSG:
-					gameRoom.broadcast(nickname + ": "+ msg.getMessage());
+					gameRoom.broadcast(nickname + ": "+ msg.getMessage(), TBGPCommand.USRMSG);
 					break;
 				case QUIT:
 					boolean ansQuit = gameRoom.quit(nickname);
@@ -95,8 +97,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 
 	@Override
 	public void connectionTerminated() {
-		// TODO Auto-generated method stub
-		
+		this.connectionTerminated  = true;
 	}
 
 

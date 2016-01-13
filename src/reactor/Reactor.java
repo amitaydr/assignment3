@@ -226,7 +226,7 @@ public class Reactor<T> implements Runnable {
         final Charset charset = Charset.forName("UTF-8");
         TokenizerFactory<TBGPMessage> tokenizerMaker = new TokenizerFactory<TBGPMessage>() {
             public MessageTokenizer<TBGPMessage> create() {
-                return new TBGPMessageTokenizer();
+                return new TBGPMessageTokenizer(charset);
             }
         };
         
