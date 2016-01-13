@@ -3,8 +3,9 @@ package app;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-
 import protocol.TBGPProtocolCallback;
+
+// TODO GameManager description
 
 public class GameManager {
 	
@@ -13,6 +14,8 @@ public class GameManager {
 	private final ConcurrentHashMap<String,GameRoom> gamerooms;
 	
 	private final HashMap<String,GameProtocolFactory> games;
+	
+	private final String gameList;
 	
 	private static final Logger logger = Logger.getLogger("edu.spl.reactor");
 
@@ -25,6 +28,7 @@ public class GameManager {
 	private GameManager() {
 		players = new ConcurrentHashMap<String,TBGPProtocolCallback>();
 		gamerooms = new ConcurrentHashMap<String,GameRoom>();
+		gameList = new String("BLUFFER");
 		games = new HashMap<String,GameProtocolFactory>();
 		games.put("BLUFFER",new GameProtocolFactory() {
 
@@ -48,7 +52,7 @@ public class GameManager {
 	 * @param callback	the player {@link TBGPProtocolCallback}
 	 * @return	true if nickname was accepted and connection was successful and false if nickname was unavailable and connection failed.
 	 */
-	public boolean acquireNickname(String nickname, TBGPProtocolCallback callback) {
+	public synchronized boolean acquireNickname(String nickname, TBGPProtocolCallback callback) {
 		if(players.containsKey(nickname)) {
 			logger.info("Nickname unavailable");
 			return false;
@@ -88,23 +92,25 @@ public class GameManager {
 	 * @param nickname	The player nickname
 	 * @return	true if the player entered the game room, false otherwise
 	 */
-	public boolean joinGameRoom(String roomName, String nickname) {
+	public synchronized boolean joinGameRoom(String roomName, String nickname) {
 		if(gamerooms.containsKey(roomName)) {
 			GameRoom gameRoom = gamerooms.get(roomName);
-			if(gameRoom.inSession()) {
-				logger.info(nickname + " was unable to join game room " + " - already in session");
-				return false;
-			} else {
-				gameRoom.addPlayer(nickname,players.get(nickname));
-				logger.info(nickname + " joined " + roomName + " game room");
-				return true;
+			synchronized(gameRoom) {
+				if(gameRoom.inSession()) {
+					logger.info(nickname + " was unable to join game room " + " - already in session");
+					return false;
+				} else {
+					gameRoom.addPlayer(nickname,players.get(nickname));
+					logger.info(nickname + " joined " + roomName + " game room");
+					return true;
+				}
 			}
 		} else {
-			GameRoom gameRoom = gamerooms.get(roomName);
-			gameRoom.addPlayer(nickname,players.get(nickname));
-			gamerooms.put(roomName, new GameRoom(roomName));
-			logger.info(nickname + " joined " + roomName + " game room");
-			return true;
+			GameRoom gameRoom = new GameRoom(roomName);
+				gameRoom.addPlayer(nickname,players.get(nickname));
+				gamerooms.put(roomName, gameRoom);
+				logger.info(nickname + " joined " + roomName + " game room");
+				return true;
 		}
 	}
 	/**
@@ -115,5 +121,9 @@ public class GameManager {
 	public GameRoom searchRoom(String roomName) {
 		if(gamerooms.containsKey(roomName)) return gamerooms.get(roomName);
 		else return null;
+	}
+	
+	public String listGames() {
+		return gameList;
 	}
 }
