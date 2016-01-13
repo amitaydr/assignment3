@@ -1,6 +1,7 @@
 package protocol;
 
 import java.io.IOException;
+import java.nio.charset.CharacterCodingException;
 
 import reactor.ConnectionHandler;
 import tokenizer.TBGPMessage;
@@ -13,8 +14,12 @@ public class TBGPProtocolCallback implements ProtocolCallback<TBGPMessage> {
 	}
 
 	@Override
-	public void sendMessage(TBGPMessage msg) throws IOException {
-		handler.addOutMessage(msg);
+	public void sendMessage(TBGPMessage msg)  {
+		try {
+			handler.addOutMessage(msg);
+		} catch (CharacterCodingException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	

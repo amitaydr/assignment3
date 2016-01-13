@@ -15,5 +15,5 @@ public interface ProtocolCallback <T > {
 * @throws IOException if the message could not be sent , or if the
 connection to this client has been closed .
 */
-void sendMessage ( T msg ) throws java . io . IOException ;
+void sendMessage ( T msg );
 }
