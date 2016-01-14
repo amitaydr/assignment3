@@ -73,7 +73,12 @@ public class TBGPMessageTokenizer implements MessageTokenizer<TBGPMessage> {
 	    		 commandString = this._stringBuf.substring(0, messageEnd);
 		         this._stringBuf.delete(0, messageEnd+this._messageSeparator.length());
 	    	 }
-	    	 command = TBGPCommand.valueOf(commandString);	    	 
+	    	 try{
+	    		 command = TBGPCommand.valueOf(commandString);	    	 
+	    	 }catch(IllegalArgumentException e){
+	    		 command = null;
+	    	 }
+	    	 if (command == null) message = commandString;  //if command is unidentified we want to tell the client what he sent
 	      }else {
 	    	  return null;
 	      }

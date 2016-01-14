@@ -19,7 +19,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 			switch (command){
 				case NICK :
 					TBGPMessage result;
-					if (nickname != null){
+					if (nickname == null){
 						boolean ans = GameManager.getInstance().acquireNickname(msg.getMessage(), (TBGPProtocolCallback) callback);
 						 result = new TBGPMessage ("NICK " +(ans? "ACCEPTED":"REJECTED"), TBGPCommand.SYSMSG);
 						if (ans) nickname = msg.getMessage();
@@ -76,11 +76,11 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					}
 					break;
 				default:
-					callback.sendMessage(new TBGPMessage( msg.getCommand() +"UNIDENTIFIED this is not a user command!" ,TBGPCommand.SYSMSG));
+					callback.sendMessage(new TBGPMessage( msg.getCommand() +" UNIDENTIFIED this is not a user command!" ,TBGPCommand.SYSMSG));
 					break;
 				}
 		}else{
-			callback.sendMessage(new TBGPMessage( msg.getCommand() +"UNIDENTIFIED this is an unknown command!" ,TBGPCommand.SYSMSG));
+			callback.sendMessage(new TBGPMessage( msg.getMessage() +" UNIDENTIFIED this is an unknown command!" ,TBGPCommand.SYSMSG));
 		}
 			
 	}

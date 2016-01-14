@@ -2,13 +2,12 @@ package app;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
 import protocol.TBGPProtocolCallback;
 import tokenizer.TBGPCommand;
 import tokenizer.TBGPMessage;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class BlufferProtocol implements GameProtocol {
 	
@@ -87,19 +86,23 @@ public class BlufferProtocol implements GameProtocol {
 
 	@Override
 	public void initialize(String jsonPath) {
-		Gson gson = new Gson();
+		JsonParser parser = new JsonParser();
 		try {
 			FileReader f = new FileReader(jsonPath);
-			JsonObject jo = gson.fromJson(f, JsonObject.class);
-			JsonArray jquestions = jo.getAsJsonArray("questions");
+			JsonObject jo = (JsonObject)parser.parse(f);
+			JsonArray jquestions = jo.get("questions").getAsJsonArray();
+			
+			
+			questions = new BlufferQuestion[jquestions.size()];
 			for(int i=0; i<jquestions.size(); i++){
 				JsonObject q = jquestions.get(i).getAsJsonObject();
-				questions[i] = new BlufferQuestion(q.getAsJsonObject("questionText").getAsString(),q.getAsJsonObject("realAnswer").getAsString() );
+				String questionText = q.get("questionText:").getAsString();
+				String realAnswer = q.get("realAnswer:").getAsString();
+				questions[i] = new BlufferQuestion(questionText,realAnswer);
 			}
 			gameRoom.broadcast(questions[0].getQuestion(), TBGPCommand.ASKTXT);
 			gameState = BlufferState.WAITING_FOR_BLUFFS;
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

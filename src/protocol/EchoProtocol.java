@@ -29,17 +29,10 @@ public class EchoProtocol implements AsyncServerProtocol<StringMessage> {
 		}
 		if (this.isEnd(msg)) {
 			this._shouldClose = true;
-			try {
 				callback.sendMessage(new StringMessage("Ok, bye bye"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
 		}else{
-			try {
 				callback.sendMessage(msg);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
