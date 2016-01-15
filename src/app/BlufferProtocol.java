@@ -55,7 +55,7 @@ public class BlufferProtocol implements GameProtocol {
 					String bluff = msg.getMessage().toLowerCase(); //Turn upper case letters to lower case letters.
 					playerCounter--;
 					if(!bluff.equals(questions[numOfCurrentQuestion].getTrueAnswer())) {
-						questions[numOfCurrentQuestion].addPlayerBluff(callback, msg.getMessage());
+						questions[numOfCurrentQuestion].addPlayerBluff(callback, bluff);
 					}
 					callback.sendMessage(new TBGPMessage("TXTRESP ACCEPTED", TBGPCommand.SYSMSG));
 					if(playerCounter == 0) {

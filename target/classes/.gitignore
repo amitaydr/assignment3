@@ -1,6 +1,3 @@
-/test/
 /app/
-/protocol/
-/tokenizer/
 /reactor/
-/TPC/
+/test/

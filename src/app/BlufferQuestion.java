@@ -58,7 +58,7 @@ public class BlufferQuestion {
 	}
 	
 	public int getNumOfChoices() {
-		return choices.length + 1;
+		return choices.length;
 	}
 
 	public String getChoice(int choiceNum) {
