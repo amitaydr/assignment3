@@ -30,7 +30,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					break;
 				case JOIN:
 					if (gameRoom != null) { //User is already in some room
-						if (!gameRoom.quit(nickname)) { //if quit returns false it means the room is in a middle of a game
+						if (!gameRoom.quit(callback)) { //if quit returns false it means the room is in a middle of a game
 							callback.sendMessage(new TBGPMessage("JOIN REJECTED cannot leave the room "+ gameRoom +" in the middle of a game!",TBGPCommand.SYSMSG));
 							break;
 						}
@@ -58,7 +58,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					gameRoom.broadcast(nickname + ": "+ msg.getMessage(), TBGPCommand.USRMSG);
 					break;
 				case QUIT:
-					boolean ansQuit = gameRoom.quit(nickname);
+					boolean ansQuit = gameRoom.quit((TBGPProtocolCallback)callback);
 					if (ansQuit){
 						GameManager.getInstance().exit(nickname);
 						shouldClose = true;
