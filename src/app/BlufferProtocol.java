@@ -2,6 +2,10 @@ package app;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Set;
+
 import protocol.TBGPProtocolCallback;
 import tokenizer.TBGPCommand;
 import tokenizer.TBGPMessage;
@@ -21,14 +25,23 @@ public class BlufferProtocol implements GameProtocol {
 	
 	private int playerCounter;
 	
+	private HashMap<TBGPProtocolCallback, Integer> scores;
+	
+	private HashMap<TBGPProtocolCallback, Integer> currentRoundScore;
+	
+	private HashMap<TBGPProtocolCallback, Boolean> wasCorrect;
+	
 	public BlufferProtocol(String jsonPath, GameRoom gameroom) {
 		this.gameRoom = gameroom;
+		scores = new HashMap<TBGPProtocolCallback, Integer>();
+		currentRoundScore = new HashMap<TBGPProtocolCallback, Integer>();
+		wasCorrect = new HashMap<TBGPProtocolCallback, Boolean>();
 		playerCounter = gameRoom.numOfPlayers();
 		initialize(jsonPath);
 	}
 
 	@Override
-	public void processMessage(TBGPMessage msg, TBGPProtocolCallback callback) {
+	public synchronized void processMessage(TBGPMessage msg, TBGPProtocolCallback callback) {
 		switch(gameState) {
 			case INITIALIZING:
 				callback.sendMessage(new TBGPMessage(msg.getCommand() + " REJECTED: Game has not yet started", TBGPCommand.SYSMSG));
@@ -67,9 +80,32 @@ public class BlufferProtocol implements GameProtocol {
 						playerCounter--;
 						callback.sendMessage(new TBGPMessage(msg.getCommand() + " ACCEPTED", TBGPCommand.SYSMSG));
 						callback.sendMessage(new TBGPMessage("The correct answer is: " + questions[numOfCurrentQuestion].getTrueAnswer(), TBGPCommand.GAMEMSG));
-						if(questions[numOfCurrentQuestion].getChoiceNum(choiceNum) == questions[numOfCurrentQuestion].getTrueAnswer()) {
-							callback.sendMessage(new TBGPMessage("Correct! +10pts", TBGPCommand.GAMEMSG));
-							//TODO Rethink the scoring method
+						if(questions[numOfCurrentQuestion].getChoice(choiceNum) == questions[numOfCurrentQuestion].getTrueAnswer()) {
+							currentRoundScore.put(callback, currentRoundScore.get(callback) + 10); //Update player score for correct answer
+							wasCorrect.put(callback, true); //Update that player picked the correct answer
+						} else {
+							TBGPProtocolCallback blufferCallback = questions[numOfCurrentQuestion].getCallbackByBluff(questions[numOfCurrentQuestion].getChoice(choiceNum));
+							currentRoundScore.put(blufferCallback, currentRoundScore.get(blufferCallback) + 5); //Update bluffer score if a player picked his bluff
+						}
+					} else callback.sendMessage(new TBGPMessage(msg.getCommand() + " REJECTED: pick a number in the correct range", TBGPCommand.SYSMSG));
+					if(playerCounter == 0) {
+						wasCorrect.forEach((k,v) -> {
+							int roundScore = currentRoundScore.get(k);
+							k.sendMessage(new TBGPMessage((v? "Correct":"Wrong") + "! +" + roundScore + "pts", TBGPCommand.GAMEMSG));
+							scores.put(k, scores.get(k) + roundScore);
+							currentRoundScore.put(k, 0);
+							v = false;
+						});
+						if(numOfCurrentQuestion < 2) {
+							numOfCurrentQuestion++;
+							gameRoom.broadcast(questions[numOfCurrentQuestion].getQuestion(), TBGPCommand.ASKTXT);
+							gameState = BlufferState.WAITING_FOR_BLUFFS;
+						} else {
+							String scoreBoard = "";
+							scores.forEach((k,v) -> {
+								gameRoom.playerNickname(k);
+							});
+							gameRoom.broadcast("Summary: ", TBGPCommand.ASKTXT);
 						}
 					}
 				}
@@ -105,8 +141,14 @@ public class BlufferProtocol implements GameProtocol {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		Set<TBGPProtocolCallback> playerList = gameRoom.getPlayerList();
+		playerList.forEach((i) -> {
+			scores.put(i, 0);
+			currentRoundScore.put(i, 0);
+			wasCorrect.put(i, false);
+		});
 	}
-	
+	//TODO For testing - need to erase before submission
 	public void printQuestions (){
 		for (int i = 0; i<questions.length; i++){
 			System.out.println(questions[i].getQuestion());
