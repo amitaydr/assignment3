@@ -50,7 +50,7 @@ public class GameRoom {
 	public boolean quit(String nickname) {
 		if(!inSession()) {
 			players.remove(nickname);
-			broadcast(nickname + " left the room", TBGPCommand.USRMSG);
+			broadcast(nickname + " left the room", TBGPCommand.SYSMSG);
 			logger.info(nickname + " left the room");
 			return true;
 		} else {
