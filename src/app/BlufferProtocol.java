@@ -2,10 +2,8 @@ package app;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
-
 import protocol.TBGPProtocolCallback;
 import tokenizer.TBGPCommand;
 import tokenizer.TBGPMessage;
@@ -105,7 +103,7 @@ public class BlufferProtocol implements GameProtocol {
 							gameState = BlufferState.WAITING_FOR_BLUFFS;
 						} else {
 							scores.forEach((k,v) -> {
-								scoreBoard =  ", " + scoreBoard + gameRoom.playerNickname(k) + ": " + v + "pts";
+								scoreBoard = scoreBoard + ", " + gameRoom.playerNickname(k) + ": " + v + "pts";
 							});
 							scoreBoard = scoreBoard.substring(2); //To not include the first comma
 							gameRoom.broadcast("Summary: " + scoreBoard, TBGPCommand.ASKTXT);

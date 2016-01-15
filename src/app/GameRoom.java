@@ -41,7 +41,7 @@ public class GameRoom {
 	}
 
 	public void addPlayer(String nickname, TBGPProtocolCallback callback) {
-		broadcast(nickname + " joined the room", TBGPCommand.USRMSG);
+		broadcast(nickname + " joined the room", TBGPCommand.SYSMSG);
 		players.put(callback, nickname);
 	}
 	
