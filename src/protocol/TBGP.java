@@ -30,10 +30,14 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					break;
 				case JOIN:
 					if (gameRoom != null) { //User is already in some room
-						if (!gameRoom.quit(nickname)) { //if quit returns false it means the room is in a middle of a game
+						if (!gameRoom.quit((TBGPProtocolCallback) callback)) { //if quit returns false it means the room is in a middle of a game
 							callback.sendMessage(new TBGPMessage("JOIN REJECTED cannot leave the room "+ gameRoom +" in the middle of a game!",TBGPCommand.SYSMSG));
 							break;
 						}
+					}
+					if (nickname == null){
+						callback.sendMessage(new TBGPMessage("JOIN REJECTED you need a nickname first! use NICK <your_nickname> command",TBGPCommand.SYSMSG));
+						break;
 					}
 					boolean ans = GameManager.getInstance().joinGameRoom(msg.getMessage(), nickname);
 					if(ans){
@@ -44,13 +48,17 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					}
 					break;
 				case LISTGAMES:
-					GameManager.getInstance().listGames();
+					callback.sendMessage(new TBGPMessage("ACCEPTED "+GameManager.getInstance().listGames(),TBGPCommand.SYSMSG));
 					break;
 				case MSG:
+					if (gameRoom == null){
+						callback.sendMessage(new TBGPMessage("MSG REJECTED you need to join a room first! use JOIN <room_name> command",TBGPCommand.SYSMSG));
+						break;
+					}
 					gameRoom.broadcast(nickname + ": "+ msg.getMessage(), TBGPCommand.USRMSG);
 					break;
 				case QUIT:
-					boolean ansQuit = gameRoom.quit(nickname);
+					boolean ansQuit = gameRoom.quit((TBGPProtocolCallback) callback);
 					if (ansQuit){
 						GameManager.getInstance().exit(nickname);
 						shouldClose = true;
@@ -63,7 +71,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					if (gameRoom != null && gameRoom.inSession()){
 						gameRoom.getGameProtocol().processMessage(msg, (TBGPProtocolCallback) callback);
 					}else{
-						callback.sendMessage(new TBGPMessage(msg.getCommand()+" REJECTED not in gameRoom or other game not in session" ,TBGPCommand.SYSMSG));
+						callback.sendMessage(new TBGPMessage(msg.getCommand()+" REJECTED not in gameRoom or no game in session" ,TBGPCommand.SYSMSG));
 					}
 					
 					break;
@@ -80,7 +88,9 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					break;
 				}
 		}else{
-			callback.sendMessage(new TBGPMessage( msg.getMessage() +" UNIDENTIFIED this is an unknown command!" ,TBGPCommand.SYSMSG));
+			callback.sendMessage(new TBGPMessage( msg.getMessage() +" UNIDENTIFIED this is an unknown command! user commands are:\n"
+					+ "NICK <nickname>,  JOIN <game_room_name>, LISTGAMES, STARTGAME <game_name>, MSG <chat_message>\n"
+					+ "TXTRESP <text_response>, SELECTRESP <number_of_selected_response>, QUIT" ,TBGPCommand.SYSMSG));
 		}
 			
 	}

@@ -52,7 +52,7 @@ public class GameRoom {
 	public boolean quit(TBGPProtocolCallback callback) {
 		if(!inSession()) {
 			String removedPlayer = players.remove(callback);
-			broadcast(removedPlayer + " left the room", TBGPCommand.USRMSG);
+			broadcast(removedPlayer + " left the room", TBGPCommand.SYSMSG);
 			logger.info(removedPlayer + " left the room");
 			return true;
 		} else {

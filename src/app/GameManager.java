@@ -15,7 +15,7 @@ public class GameManager {
 	
 	private final HashMap<String,GameProtocolFactory> games;
 	
-	private final String gameList = "";
+	private String gameList = "";
 	
 	private static final Logger logger = Logger.getLogger("edu.spl.reactor");
 
@@ -127,5 +127,6 @@ public class GameManager {
 			}
 			
 		});
+		games.forEach((k,v)->gameList = gameList + " "+ k);
 	}
 }
