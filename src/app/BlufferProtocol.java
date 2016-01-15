@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Set;
 import protocol.TBGPProtocolCallback;
 import tokenizer.TBGPCommand;
@@ -51,9 +52,12 @@ public class BlufferProtocol implements GameProtocol {
 				if(msg.getCommand() != TBGPCommand.TXTRESP) {
 					callback.sendMessage(new TBGPMessage(msg.getCommand() + " REJECTED: Expecting a bluff for the question", TBGPCommand.SYSMSG));
 				} else {
+					String bluff = msg.getMessage().toLowerCase(); //Turn upper case letters to lower case letters.
 					playerCounter--;
-					questions[numOfCurrentQuestion].addPlayerBluff(callback, msg.getMessage());
-					callback.sendMessage(new TBGPMessage("TXTRSP ACCEPTED", TBGPCommand.SYSMSG));
+					if(!bluff.equals(questions[numOfCurrentQuestion].getTrueAnswer())) {
+						questions[numOfCurrentQuestion].addPlayerBluff(callback, msg.getMessage());
+					}
+					callback.sendMessage(new TBGPMessage("TXTRESP ACCEPTED", TBGPCommand.SYSMSG));
 					if(playerCounter == 0) {
 						String[] choices = questions[numOfCurrentQuestion].printAnswers();
 						String choiceList = "";
@@ -85,8 +89,10 @@ public class BlufferProtocol implements GameProtocol {
 							currentRoundScore.put(callback, currentRoundScore.get(callback) + 10); //Update player score for correct answer
 							wasCorrect.put(callback, true); //Update that player picked the correct answer
 						} else {
-							TBGPProtocolCallback blufferCallback = questions[numOfCurrentQuestion].getCallbackByBluff(questions[numOfCurrentQuestion].getChoice(choiceNum));
-							currentRoundScore.put(blufferCallback, currentRoundScore.get(blufferCallback) + 5); //Update bluffer score if a player picked his bluff
+							LinkedList<TBGPProtocolCallback> bluffersCallbacks = questions[numOfCurrentQuestion].getCallbackByBluff(questions[numOfCurrentQuestion].getChoice(choiceNum));
+							bluffersCallbacks.forEach((i) -> {
+								currentRoundScore.put(i, currentRoundScore.get(i) + 5); //Update bluffer score if a player picked his bluff
+							});
 						}
 					} else callback.sendMessage(new TBGPMessage(msg.getCommand() + " REJECTED: pick a number in the correct range", TBGPCommand.SYSMSG));
 					if(playerCounter == 0) {

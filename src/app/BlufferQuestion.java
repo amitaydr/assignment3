@@ -2,6 +2,7 @@ package app;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import protocol.TBGPProtocolCallback;
@@ -12,7 +13,7 @@ public class BlufferQuestion {
 	
 	private String realAnswer;
 	
-	private HashMap<String,TBGPProtocolCallback> bluffs = new HashMap<String,TBGPProtocolCallback>();
+	private HashMap<String,LinkedList<TBGPProtocolCallback>> bluffs = new HashMap<String,LinkedList<TBGPProtocolCallback>>();
 	
 	private String[] choices = null;
 
@@ -30,14 +31,20 @@ public class BlufferQuestion {
 	}
 	
 	public void addPlayerBluff(TBGPProtocolCallback callback, String bluff) {
-		bluffs.put(bluff, callback);
+		if(bluffs.containsKey(bluff)) {
+			bluffs.get(bluff).add(callback);
+		} else {
+			LinkedList<TBGPProtocolCallback> bluffers = new LinkedList<TBGPProtocolCallback>();
+			bluffers.add(callback);
+			bluffs.put(bluff, bluffers);
+		}
 	}
 	
 	public String[] printAnswers() {
 		choices = new String[bluffs.size() + 1];
 		int roll = (int)(choices.length*Math.random());
 		choices[roll] = realAnswer;
-		Iterator<Entry<String, TBGPProtocolCallback>> it = bluffs.entrySet().iterator();
+		Iterator<Entry<String, LinkedList<TBGPProtocolCallback>>> it = bluffs.entrySet().iterator();
 		int i = 0;
 		while(it.hasNext()) {
 			if(choices[i] == null) choices[i] = it.next().getKey();
@@ -48,10 +55,6 @@ public class BlufferQuestion {
 			i++;
 		}
 		return choices;
-	}
-	
-	public TBGPProtocolCallback searchBluff(String bluff) {
-		return bluffs.get(bluff);
 	}
 	
 	public int getNumOfChoices() {
@@ -65,7 +68,7 @@ public class BlufferQuestion {
 		} else return null;
 	}
 
-	public TBGPProtocolCallback getCallbackByBluff(String choice) {
+	public LinkedList<TBGPProtocolCallback> getCallbackByBluff(String choice) {
 		return bluffs.get(choice);
 	}
 }
