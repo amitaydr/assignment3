@@ -25,6 +25,8 @@ public class BlufferProtocol implements GameProtocol {
 	
 	private int playerCounter;
 	
+	String scoreBoard = "";
+	
 	private HashMap<TBGPProtocolCallback, Integer> scores;
 	
 	private HashMap<TBGPProtocolCallback, Integer> currentRoundScore;
@@ -101,23 +103,18 @@ public class BlufferProtocol implements GameProtocol {
 							gameRoom.broadcast(questions[numOfCurrentQuestion].getQuestion(), TBGPCommand.ASKTXT);
 							gameState = BlufferState.WAITING_FOR_BLUFFS;
 						} else {
-							String scoreBoard = "";
 							scores.forEach((k,v) -> {
-								gameRoom.playerNickname(k);
+								scoreBoard =  ", " + scoreBoard + gameRoom.playerNickname(k) + ": " + v + "pts";
 							});
-							gameRoom.broadcast("Summary: ", TBGPCommand.ASKTXT);
+							scoreBoard = scoreBoard.substring(2); //To not include the first comma
+							gameRoom.broadcast("Summary: " + scoreBoard, TBGPCommand.ASKTXT);
+							gameRoom.endGame();
 						}
 					}
 				}
 				break;
 		}
 
-	}
-
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

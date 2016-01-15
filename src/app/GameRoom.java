@@ -28,7 +28,7 @@ public class GameRoom {
 			GameProtocol game = GameManager.getInstance().searchGame(gameName).create(this);
 			//to take care of game is null
 			this.currentGame = game;
-			logger.info(game.getName() + " game starting");
+			logger.info(gameName + " game starting");
 			return true;
 		} else {
 			logger.info("A different game is already in session");
@@ -84,6 +84,10 @@ public class GameRoom {
 	
 	public String playerNickname(TBGPProtocolCallback callback) {
 		return players.get(callback);
+	}
+
+	public void endGame() {
+		currentGame = null;
 	}
 
 }

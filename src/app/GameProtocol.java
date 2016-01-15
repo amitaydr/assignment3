@@ -6,8 +6,6 @@ import tokenizer.TBGPMessage;
 public interface GameProtocol {
 	
 	public void processMessage(TBGPMessage msg, TBGPProtocolCallback callback);
-		
-	public String getName();
 	
 	public void initialize(String jsonPath);
 }
