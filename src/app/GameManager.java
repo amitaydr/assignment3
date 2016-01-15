@@ -118,6 +118,10 @@ public class GameManager {
 		return gameList;
 	}
 	
+	public TBGPProtocolCallback getCallback(String nick){
+		return players.get(nick);
+	}
+	
 	public void initialize(String[] jsonPaths) {
 		games.put("BLUFFER", new GameProtocolFactory() {
 			

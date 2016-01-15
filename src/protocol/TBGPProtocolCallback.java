@@ -1,8 +1,6 @@
 package protocol;
 
-import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
-
 import reactor.ConnectionHandler;
 import tokenizer.TBGPMessage;
 
