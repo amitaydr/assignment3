@@ -58,7 +58,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					gameRoom.broadcast(nickname + ": "+ msg.getMessage(), TBGPCommand.USRMSG);
 					break;
 				case QUIT:
-					boolean ansQuit = gameRoom.quit((TBGPProtocolCallback) callback);
+					boolean ansQuit = gameRoom.quit((TBGPProtocolCallback)callback);
 					if (ansQuit){
 						GameManager.getInstance().exit(nickname);
 						shouldClose = true;
