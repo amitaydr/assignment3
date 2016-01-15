@@ -35,8 +35,8 @@ public class BlufferQuestion {
 	
 	public String[] printAnswers() {
 		choices = new String[bluffs.size() + 1];
-		int role = (int)(choices.length*Math.random());
-		choices[role] = realAnswer;
+		int roll = (int)(choices.length*Math.random());
+		choices[roll] = realAnswer;
 		Iterator<Entry<String, TBGPProtocolCallback>> it = bluffs.entrySet().iterator();
 		int i = 0;
 		while(it.hasNext()) {
@@ -58,10 +58,14 @@ public class BlufferQuestion {
 		return choices.length + 1;
 	}
 
-	public String getChoiceNum(int choiceNum) {
+	public String getChoice(int choiceNum) {
 		if(choices != null) {
 			if(choiceNum < choices.length && choiceNum >=0) return choices[choiceNum];
 			else return null;
 		} else return null;
+	}
+
+	public TBGPProtocolCallback getCallbackByBluff(String choice) {
+		return bluffs.get(choice);
 	}
 }
