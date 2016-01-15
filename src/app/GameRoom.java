@@ -24,6 +24,7 @@ public class GameRoom {
 	public synchronized boolean startGame(String gameName) {
 		if(!inSession()) {
 			GameProtocol game = GameManager.getInstance().searchGame(gameName).create(this);
+			//to take care of game is null
 			this.currentGame = game;
 			logger.info(game.getName() + " game starting");
 			return true;

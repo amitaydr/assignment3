@@ -118,12 +118,12 @@ public class GameManager {
 		return gameList;
 	}
 	
-	public void initialize(String[] gameFactories) {
+	public void initialize(String[] jsonPaths) {
 		games.put("BLUFFER", new GameProtocolFactory() {
 			
 			@Override
 			public GameProtocol create(GameRoom gameroom) {
-				return new BlufferProtocol(gameFactories[0], gameroom);
+				return new BlufferProtocol(jsonPaths[0], gameroom);
 			}
 			
 		});

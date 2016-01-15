@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import app.GameManager;
 import protocol.*;
 import tokenizer.*;
 
@@ -195,10 +196,12 @@ public class Reactor<T> implements Runnable {
      * number of threads in the thread pool are read from the command line.
      */
     public static void main(String args[]) {
-        if (args.length != 2) {
+        if (args.length != 3) {
             System.err.println("Usage: java Reactor <port> <pool_size>");
             System.exit(1);
         }
+        String[] jsonPaths = {"C:/Users/amitaydr/Desktop/Ass3/assignment3/" + args[2] + ".json"};
+        GameManager.getInstance().initialize(jsonPaths);
 
         try {
             int port = Integer.parseInt(args[0]);

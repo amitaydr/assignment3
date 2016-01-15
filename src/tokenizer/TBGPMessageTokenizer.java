@@ -67,10 +67,10 @@ public class TBGPMessageTokenizer implements MessageTokenizer<TBGPMessage> {
 	      if (messageEnd > -1) {
 	    	 if (commandEnd >-1 && commandEnd < messageEnd){
 		    	 commandString = this._stringBuf.substring(0, commandEnd);
-		         message = this._stringBuf.substring(commandEnd+" ".length(), messageEnd);
+		         message = this._stringBuf.substring(commandEnd+" ".length(), messageEnd-this._messageSeparator.length());
 		         this._stringBuf.delete(0, messageEnd+this._messageSeparator.length());
 	    	 }else{
-	    		 commandString = this._stringBuf.substring(0, messageEnd);
+	    		 commandString = this._stringBuf.substring(0, messageEnd-this._messageSeparator.length());
 		         this._stringBuf.delete(0, messageEnd+this._messageSeparator.length());
 	    	 }
 	    	 try{
