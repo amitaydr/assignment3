@@ -105,7 +105,7 @@ public class BlufferProtocol implements GameProtocol {
 							gameState = BlufferState.WAITING_FOR_BLUFFS;
 						} else {
 							scores.forEach((k,v) -> {
-								scoreBoard =  ", " + scoreBoard + gameRoom.playerNickname(k) + ": " + v + "pts";
+								scoreBoard = scoreBoard + ", " + gameRoom.playerNickname(k) + ": " + v + "pts";
 							});
 							scoreBoard = scoreBoard.substring(2); //To not include the first comma
 							gameRoom.broadcast("Summary: " + scoreBoard, TBGPCommand.ASKTXT);

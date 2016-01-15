@@ -107,6 +107,8 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 
 	@Override
 	public void connectionTerminated() {
+		gameRoom.quit(GameManager.getInstance().getCallback(nickname));
+		GameManager.getInstance().exit(nickname);
 		this.connectionTerminated  = true;
 	}
 
