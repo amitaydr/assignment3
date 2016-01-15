@@ -200,8 +200,7 @@ public class Reactor<T> implements Runnable {
             System.err.println("Usage: java Reactor <port> <pool_size>");
             System.exit(1);
         }
-        String[] jsonPaths = {"../jsonExample/" + args[2] + ".json"};
-        //TODO change 
+        String[] jsonPaths = {"C:/Users/amitaydr/Desktop/Ass3/assignment3/" + args[2] + ".json"};
         GameManager.getInstance().initialize(jsonPaths);
 
         try {
