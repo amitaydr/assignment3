@@ -1,11 +1,9 @@
 package test;
 
 import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import app.BlufferProtocol;
 import app.GameProtocol;
 import app.GameProtocolFactory;

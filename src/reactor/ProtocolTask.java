@@ -1,8 +1,6 @@
 package reactor;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
-
 import protocol.*;
 import tokenizer.*;
 

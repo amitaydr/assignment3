@@ -44,7 +44,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 						callback.sendMessage(new TBGPMessage("JOIN ACCEPTED joined the room "+ msg.getMessage(),TBGPCommand.SYSMSG));
 						gameRoom = GameManager.getInstance().searchRoom(msg.getMessage());
 					}else{ 
-						callback.sendMessage(new TBGPMessage("JOIN REJECTED room"+ msg.getMessage() +"is in the middle of a game!",TBGPCommand.SYSMSG));
+						callback.sendMessage(new TBGPMessage("JOIN REJECTED the room "+ msg.getMessage() +" is in the middle of a game!",TBGPCommand.SYSMSG));
 					}
 					break;
 				case LISTGAMES:
@@ -58,14 +58,20 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					gameRoom.broadcast(nickname + ": "+ msg.getMessage(), TBGPCommand.USRMSG);
 					break;
 				case QUIT:
-					boolean ansQuit = gameRoom.quit((TBGPProtocolCallback)callback);
-					if (ansQuit){
+					if (gameRoom != null){
+						boolean ansQuit = gameRoom.quit((TBGPProtocolCallback)callback);
+						if (ansQuit){
+							GameManager.getInstance().exit(nickname);
+							shouldClose = true;
+							callback.sendMessage(new TBGPMessage("QUIT ACCEPTED bye bye", TBGPCommand.SYSMSG));
+						}else{
+							callback.sendMessage(new TBGPMessage("QUIT REJECTED cannot leave before game is over!", TBGPCommand.SYSMSG));
+						}	
+					} else{
 						GameManager.getInstance().exit(nickname);
 						shouldClose = true;
 						callback.sendMessage(new TBGPMessage("QUIT ACCEPTED bye bye", TBGPCommand.SYSMSG));
-					}else{
-						callback.sendMessage(new TBGPMessage("QUIT REJECTED cannot leave before game is over!", TBGPCommand.SYSMSG));
-					}				
+					}
 					break;
 				case SELECTRESP : case TXTRESP:
 					if (gameRoom != null && gameRoom.inSession()){
