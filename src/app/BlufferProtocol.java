@@ -59,7 +59,7 @@ public class BlufferProtocol implements GameProtocol {
 						String[] choices = questions[numOfCurrentQuestion].printAnswers();
 						String choiceList = "";
 						for(int i = 0; i < choices.length; i++) {
-							choiceList = i + ". " + choices[i] + " ";
+							choiceList = choiceList + i + ". " + choices[i] + " ";
 						}
 						gameRoom.broadcast(choiceList, TBGPCommand.ASKCHOICES);
 						playerCounter = gameRoom.numOfPlayers();
@@ -96,11 +96,12 @@ public class BlufferProtocol implements GameProtocol {
 							k.sendMessage(new TBGPMessage((v? "Correct":"Wrong") + "! +" + roundScore + "pts", TBGPCommand.GAMEMSG));
 							scores.put(k, scores.get(k) + roundScore);
 							currentRoundScore.put(k, 0);
-							v = false;
+							wasCorrect.put(k, false);
 						});
 						if(numOfCurrentQuestion < 2) {
 							numOfCurrentQuestion++;
 							gameRoom.broadcast(questions[numOfCurrentQuestion].getQuestion(), TBGPCommand.ASKTXT);
+							playerCounter = gameRoom.numOfPlayers();
 							gameState = BlufferState.WAITING_FOR_BLUFFS;
 						} else {
 							scores.forEach((k,v) -> {

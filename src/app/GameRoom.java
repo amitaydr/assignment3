@@ -74,12 +74,7 @@ public class GameRoom {
 	}
 
 	public Set<TBGPProtocolCallback> getPlayerList() {
-		if(inSession()) {
 			return players.keySet();
-		} else {
-			logger.info("Can't receive player list until game begins");
-			return null;
-		}
 	}
 	
 	public String playerNickname(TBGPProtocolCallback callback) {
