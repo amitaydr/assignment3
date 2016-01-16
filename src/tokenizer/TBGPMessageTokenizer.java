@@ -64,7 +64,7 @@ public class TBGPMessageTokenizer implements MessageTokenizer<TBGPMessage> {
 	      String commandString = null;
 	      int messageEnd = this._stringBuf.indexOf(this._messageSeparator);
 	      int commandEnd = this._stringBuf.indexOf(" ");
-	      if (messageEnd > -1) {
+	      if (messageEnd > 0) {
 	    	 if (commandEnd >-1 && commandEnd < messageEnd){
 		    	 commandString = this._stringBuf.substring(0, commandEnd);
 		         message = this._stringBuf.substring(commandEnd+" ".length(), messageEnd-this._messageSeparator.length());
@@ -79,6 +79,9 @@ public class TBGPMessageTokenizer implements MessageTokenizer<TBGPMessage> {
 	    		 command = null;
 	    	 }
 	    	 if (command == null) message = commandString;  //if command is unidentified we want to tell the client what he sent
+	      }else if(messageEnd == 0) {
+	    	  commandString = "EMPTY_MESSAGE";
+		      this._stringBuf.delete(0, messageEnd+this._messageSeparator.length());
 	      }else {
 	    	  return null;
 	      }

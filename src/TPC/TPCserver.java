@@ -5,7 +5,6 @@ import java.net.*;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
-
 import app.GameManager;
 import protocol.AsyncServerProtocol;
 import protocol.ProtocolCallback;
@@ -53,7 +52,7 @@ public class TPCserver<T> implements Runnable {
 	{
 		try {
 			serverSocket = createServerSocket(listenPort);
-			System.out.println("Listening...");
+			System.out.println("Listening on port " + listenPort );
 		}
 		catch (IOException e) {
 			System.out.println("Cannot listen on port " + listenPort);
