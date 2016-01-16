@@ -1,45 +1,37 @@
 package TPC;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.Socket;
-
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.CharacterCodingException;
+import java.util.logging.Logger;
+import protocol.AsyncServerProtocol;
+import protocol.ProtocolCallback;
 import protocol.ServerProtocol;
-import tokenizer.Message;
+import protocol.TPCCallbackFactory;
 import tokenizer.MessageTokenizer;
 
 public class TPCConnectionHandler<T> implements Runnable {
-	private BufferedReader in;
-	private PrintWriter out;
-	Socket clientSocket;
+	SocketChannel clientSocket;
 	ServerProtocol<T> protocol;
 	MessageTokenizer<T> tokenizer;
+	ProtocolCallback<T> callback;
+	private TPCCallbackFactory<T> callbackFactory;
+	private static final int BUFFER_SIZE = 1024;
+	private static final Logger logger = Logger.getLogger("edu.spl.TPC");
+
 	
-	public TPCConnectionHandler(Socket acceptedSocket, ServerProtocol<T> p)
-	{
-		in = null;
-		out = null;
-		clientSocket = acceptedSocket;
+	public TPCConnectionHandler(SocketChannel socketChannel, ServerProtocol<T> p, MessageTokenizer<T> tok, TPCCallbackFactory<T> callbackFac) {
+		clientSocket = socketChannel;
 		protocol = p;
+		tokenizer = tok;
+		callbackFactory = callbackFac;
 		System.out.println("Accepted connection from client!");
-		System.out.println("The client is from: " + acceptedSocket.getInetAddress() + ":" + acceptedSocket.getPort());
+		System.out.println("The client is from: " + socketChannel.socket().getRemoteSocketAddress());
 	}
 	
-	public void run()
-	{
-
-		String msg;
-		
-		try {
+	public void run() {		
 			initialize();
-		}
-		catch (IOException e) {
-			System.out.println("Error in initializing I/O");
-		}
-
 		try {
 			process();
 		} 
@@ -52,55 +44,67 @@ public class TPCConnectionHandler<T> implements Runnable {
 
 	}
 	
-	public void process() throws IOException
-	{
-		Message msg;
+	public void process() throws IOException {
+		T msg;
+		ByteBuffer buff = ByteBuffer.allocate(BUFFER_SIZE );
+		int numBytesRead;
 		
-		while ((msg = tokenizer.in.readLine()) != null)
-		{
-			tokenizer.addBytes(in.lines());
-			System.out.println("Received \"" + msg + "\" from client");
-			
-			protocol.processMessage(msg, null);
-			if (response != null)
-			{
-				out.println(response);
+		while (true){
+			numBytesRead = 0;
+			try {
+				numBytesRead = clientSocket.read(buff);
+			} catch (IOException e) {
+				numBytesRead = -1;
 			}
-			
-			if (protocol.isEnd(msg))
-			{
-				break;
+			// is the channel closed??
+			if (numBytesRead == -1) {
+				// No more bytes can be read from the channel
+				logger.info("client on " + clientSocket.socket().getRemoteSocketAddress() + " has disconnected");
+				close();
+				// tell the protocol that the connection terminated.
+				if (protocol instanceof AsyncServerProtocol){
+					((AsyncServerProtocol<T>)protocol).connectionTerminated();
+				}
+				return;
 			}
-			
+			buff.flip();
+			tokenizer.addBytes(buff);
+			if (tokenizer.hasMessage()) {
+			         msg = tokenizer.nextMessage();
+			         protocol.processMessage(msg, callback);
+			         if (protocol.isEnd(msg))break;
+			}
 		}
 	}
 	
+	public void sendMessage(T msg) {
+		
+		ByteBuffer buf;
+		try {
+			buf = tokenizer.getBytesForMessage(msg);
+			while (buf.remaining() != 0) {
+				clientSocket.write(buf);
+				System.out.println("in the loop!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			}
+		} catch (CharacterCodingException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
 	// Starts listening
-	public void initialize() throws IOException
-	{
-		// Initialize I/O
-		in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),"UTF-8"));
-		out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(),"UTF-8"), true);
-		System.out.println("I/O initialized");
+	public void initialize()  {
+		callback = callbackFactory.create(this);
 	}
 	
 	// Closes the connection
 	public void close()
 	{
-		try {
-			if (in != null)
-			{
-				in.close();
-			}
-			if (out != null)
-			{
-				out.close();
-			}
-			
+		try {			
 			clientSocket.close();
 		}
-		catch (IOException e)
-		{
+		catch (IOException e){
 			System.out.println("Exception in closing I/O");
 		}
 	}

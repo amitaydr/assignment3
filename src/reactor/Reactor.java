@@ -197,7 +197,7 @@ public class Reactor<T> implements Runnable {
      */
     public static void main(String args[]) {
         if (args.length != 3) {
-            System.err.println("Usage: java Reactor <port> <pool_size>");
+            System.err.println("Usage: java Reactor <port> <pool_size> <json_paths>");
             System.exit(1);
         }
         String[] jsonPaths = {"jsonExample/" + args[2] + ".json"};
@@ -235,7 +235,7 @@ public class Reactor<T> implements Runnable {
         
         ProtocolCallbackFactory<TBGPMessage> callbackMaker = new ProtocolCallbackFactory<TBGPMessage>() {
         	public ProtocolCallback<TBGPMessage> create(ConnectionHandler<TBGPMessage> h) {
-                return new TBGPProtocolCallback(h);
+                return new TBGPReactorCallback(h);
             }
         };
 

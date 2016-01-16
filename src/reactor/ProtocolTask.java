@@ -29,12 +29,6 @@ public class ProtocolTask<T> implements Runnable {
       while (_tokenizer.hasMessage()) {
          T msg = _tokenizer.nextMessage();
           this._protocol.processMessage(msg, _handler.getCallbackProtocol());
-      /*   if (response != null) {      //the old code
-            try {
-               ByteBuffer bytes = _tokenizer.getBytesForMessage(response);
-               this._handler.addOutData(bytes);
-            } catch (CharacterCodingException e) { e.printStackTrace(); }
-         }*/
       }
 	}
 
