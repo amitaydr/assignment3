@@ -13,8 +13,7 @@ public class TBGPTCPCallback implements TBGPProtocolCallback {
 
 	@Override
 	public void sendMessage(TBGPMessage msg) {
-		m_TPCConnectionHandler.sendMessage(msg);
-	
+		m_TPCConnectionHandler.sendMessage(msg);	
 	}
 
 }

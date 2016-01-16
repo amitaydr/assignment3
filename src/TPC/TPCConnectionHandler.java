@@ -74,6 +74,7 @@ public class TPCConnectionHandler<T> implements Runnable {
 			         protocol.processMessage(msg, callback);
 			         if (protocol.isEnd(msg))break;
 			}
+			buff.clear();
 		}
 	}
 	
@@ -84,7 +85,6 @@ public class TPCConnectionHandler<T> implements Runnable {
 			buf = tokenizer.getBytesForMessage(msg);
 			while (buf.remaining() != 0) {
 				clientSocket.write(buf);
-				System.out.println("in the loop!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			}
 		} catch (CharacterCodingException e1) {
 			e1.printStackTrace();
