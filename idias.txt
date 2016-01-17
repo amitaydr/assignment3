@@ -1,3 +1,0 @@
-רעיונות spl
-for each room- create a Room object that will hold the data for the game in the specific room.
-T- instead of stringMessage - new type with a field of command enum and message string

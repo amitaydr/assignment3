@@ -26,7 +26,14 @@ public class TPCserver<T> implements Runnable {
 	private static final Logger logger = Logger.getLogger("edu.spl.TPC");
 
 	
-	
+	/**
+	 *  the TPCserver constructor
+	 *  
+	 * @param port the port number for the server socket
+	 * @param p server protocol factory needed to create new protocols for new connections
+	 * @param t tokenizer factory needed to create new tokenizers for new connections
+	 * @param c callback factory in order to create a new callback fo every new connection
+	 */
 	public TPCserver(int port, ServerProtocolFactory<T> p, TokenizerFactory<T> t, TPCCallbackFactory<T> c)
 	{
 		serverSocket = null;
@@ -36,6 +43,12 @@ public class TPCserver<T> implements Runnable {
 		callbackFactory = c;
 	}
 	
+	/**
+	 * creates a server socket channel and binds it to the given port in a *blocking* way (unlike reactor)
+	 * @param port port to bind the server socket to
+	 * @return the new server socket 
+	 * @throws IOException if the port is busy
+	 */
 	private ServerSocketChannel createServerSocket(int port)
             throws IOException {
         try {
@@ -47,7 +60,12 @@ public class TPCserver<T> implements Runnable {
             throw e;
         }
     }
-	
+	 
+	/**
+	 * first- creating the server socket channel. 
+	 * then, waiting for connections in the serverSocket.accept() method (it is a blocking method)
+	 * for every new TPCconnection create a new connectionHandler and run it in a new thread
+	 */
 	public void run()
 	{
 		try {
@@ -72,11 +90,16 @@ public class TPCserver<T> implements Runnable {
 	}
 	
 
-	// Closes the connection
+	/**
+	 * closes the connection
+	 * @throws IOException
+	 */
 	public void close() throws IOException
 	{
 		serverSocket.close();
 	}
+	
+	
 	
 	public static void main(String[] args) throws IOException
 	{

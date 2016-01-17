@@ -24,7 +24,6 @@ public class ProtocolTask<T> implements Runnable {
 	// we synchronize on ourselves, in case we are executed by several threads
 	// from the thread pool.
 	public synchronized void run() {
-		//TODO need to adjust to callbacks
       // go over all complete messages and process them.
       while (_tokenizer.hasMessage()) {
          T msg = _tokenizer.nextMessage();

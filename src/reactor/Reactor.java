@@ -45,6 +45,7 @@ public class Reactor<T> implements Runnable {
      * @param port      the port to bind the Reactor to
      * @param protocol  the protocol factory to work with
      * @param tokenizer the tokenizer factory to work with
+     * @param callbackFac the callback factory to work with
      * @throws IOException if some I/O problems arise during connection
      */
     public Reactor(int port, int poolSize, ServerProtocolFactory<T> protocol, TokenizerFactory<T> tokenizer, ProtocolCallbackFactory<T> callbackFac) {
@@ -79,7 +80,7 @@ public class Reactor<T> implements Runnable {
      * requests from clients
      * <LI>For each request in the selection set:
      * <UL>
-     * If it is <B>acceptable</B>, use the ConnectionAcceptor to accept it,
+     * <LI>If it is <B>acceptable</B>, use the ConnectionAcceptor to accept it,
      * create a new ConnectionHandler for it register it to the Selector
      * <LI>If it is <B>readable</B>, use the ConnectionHandler to read it,
      * extract messages and insert them to the ThreadPool
@@ -191,9 +192,9 @@ public class Reactor<T> implements Runnable {
     }
 
     /**
-     * Main program, used for demonstration purposes. Create and run a
-     * Reactor-based server for the Echo protocol. Listening port number and
-     * number of threads in the thread pool are read from the command line.
+     * Main program. Create and run a
+     * Reactor-based server for the ETBGP protocol. Listening port number,
+     * number of threads in the thread pool, and paths for the JSON inputs are read from the command line.
      */
     public static void main(String args[]) {
         if (args.length != 3) {
@@ -217,7 +218,13 @@ public class Reactor<T> implements Runnable {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * used by main to create a TBGPserver
+     * @param port port to listen to
+     * @param poolSize number of threads in the executor
+     * @return a new reactor that uses TBGP protocol, TBGP tokenizer, and TBGP callback
+     */
     public static Reactor<TBGPMessage> startTBGPServer(int port, int poolSize) {
         ServerProtocolFactory<TBGPMessage> protocolMaker = new ServerProtocolFactory<TBGPMessage>() {
             public AsyncServerProtocol<TBGPMessage> create() {

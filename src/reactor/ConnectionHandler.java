@@ -172,7 +172,7 @@ public class ConnectionHandler<T> {
 	}
 
 	/**
-	 * switches the handler to read / write TODO Auto-generated catch blockmode
+	 * switches the handler to read / write mode
 	 * 
 	 * @throws ClosedChannelException
 	 *             if the channel is closed

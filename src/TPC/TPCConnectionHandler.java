@@ -20,7 +20,13 @@ public class TPCConnectionHandler<T> implements Runnable {
 	private static final int BUFFER_SIZE = 1024;
 	private static final Logger logger = Logger.getLogger("edu.spl.TPC");
 
-	
+	/**
+	 * TPCConnectionHandler constructor
+	 * @param socketChannel the connection channel to the client
+	 * @param p the server protocol to use
+	 * @param tok tokenizer for handling bytes and converting them to T messages and vice versa 
+	 * @param callbackFac a callback factory that will be used only once to create this connectionHandler's callback
+	 */
 	public TPCConnectionHandler(SocketChannel socketChannel, ServerProtocol<T> p, MessageTokenizer<T> tok, TPCCallbackFactory<T> callbackFac) {
 		clientSocket = socketChannel;
 		protocol = p;
@@ -30,6 +36,9 @@ public class TPCConnectionHandler<T> implements Runnable {
 		System.out.println("The client is from: " + socketChannel.socket().getRemoteSocketAddress());
 	}
 	
+	/**
+	 * first initialize, then go into process mode and then close.
+	 */
 	public void run() {		
 			initialize();
 		try {
@@ -44,6 +53,12 @@ public class TPCConnectionHandler<T> implements Runnable {
 
 	}
 	
+	/**
+	 * in a loop:
+	 * reading bytes from socket, passing them to the tokenizer. 
+	 * if the tokenizer has a full message available send it to the protocol to process, along with the callback.
+	 * @throws IOException
+	 */
 	public void process() throws IOException {
 		T msg;
 		ByteBuffer buff = ByteBuffer.allocate(BUFFER_SIZE );
@@ -78,6 +93,11 @@ public class TPCConnectionHandler<T> implements Runnable {
 		}
 	}
 	
+	/**
+	 * a function that is being called from the callback- sending a message to the client.
+	 * uses the tokenizer to convert the message to bytes and then write them to the socket.
+	 * @param msg message to send
+	 */
 	public void sendMessage(T msg) {
 		
 		ByteBuffer buf;
@@ -93,12 +113,16 @@ public class TPCConnectionHandler<T> implements Runnable {
 		}	
 	}
 	
-	// Starts listening
+	/**
+	 * used to avoid a possibility that 'this' escapes before construction is done
+	 */
 	public void initialize()  {
 		callback = callbackFactory.create(this);
 	}
 	
-	// Closes the connection
+	/**
+	 *  Closes the connection
+	 */
 	public void close()
 	{
 		try {			
