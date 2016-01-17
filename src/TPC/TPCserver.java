@@ -99,7 +99,11 @@ public class TPCserver<T> implements Runnable {
 		serverSocket.close();
 	}
 	
-	
+	/**
+	 * main function- creates and runs a TBGP TPC server 
+	 * @param args  first argument- port number. second argument- json paths for the games
+	 * @throws IOException
+	 */
 	
 	public static void main(String[] args) throws IOException
 	{
