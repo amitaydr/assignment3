@@ -58,16 +58,20 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					gameRoom.broadcast(nickname + ": "+ msg.getMessage(), TBGPCommand.USRMSG);
 					break;
 				case QUIT:
+					System.out.println("got quit message TBGP"); // TODO to delete
 					if (gameRoom != null){
 						boolean ansQuit = gameRoom.quit((TBGPProtocolCallback)callback);
 						if (ansQuit){
+							System.out.println("ansQuit = true"); // TODO to delete
 							GameManager.getInstance().exit(nickname);
 							shouldClose = true;
 							callback.sendMessage(new TBGPMessage("QUIT ACCEPTED bye bye", TBGPCommand.SYSMSG));
 						}else{
+							System.out.println("ansQuit = false"); // TODO to delete
 							callback.sendMessage(new TBGPMessage("QUIT REJECTED cannot leave before game is over!", TBGPCommand.SYSMSG));
 						}	
 					} else{
+						System.out.println("gameroom = null"); // TODO to delete
 						GameManager.getInstance().exit(nickname);
 						shouldClose = true;
 						callback.sendMessage(new TBGPMessage("QUIT ACCEPTED bye bye", TBGPCommand.SYSMSG));
@@ -103,6 +107,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 
 	@Override
 	public boolean isEnd(TBGPMessage msg) {
+		if (msg.getCommand() == null)return false;
 		return msg.getCommand().equals(TBGPCommand.QUIT);
 	}
 
@@ -113,6 +118,7 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 
 	@Override
 	public void connectionTerminated() {
+		System.out.println("connection terminated"); // TODO to delete
 		gameRoom.quit(GameManager.getInstance().getCallback(nickname));
 		GameManager.getInstance().exit(nickname);
 		this.connectionTerminated  = true;
