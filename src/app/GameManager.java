@@ -5,8 +5,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import protocol.TBGPProtocolCallback;
 
-// TODO GameManager description
-
+/**
+ * The GameManager class is implemented as a thread-safe singleton.
+ * This class stores lists of players, game rooms and games.
+ * It is responsible to convey players from one {@link GameRoom} to the other,
+ * create new {@link GameRooms}s and create the {@link GameProtocol}s for them.
+ */
 public class GameManager {
 	
 	private final ConcurrentHashMap<String,TBGPProtocolCallback> players;
@@ -18,7 +22,7 @@ public class GameManager {
 	private String gameList = "";
 	
 	private static final Logger logger = Logger.getLogger("edu.spl.reactor");
-
+	
 	private static class GameManagerInstance {
 		private static GameManager instance = new GameManager();
 	}
@@ -113,15 +117,24 @@ public class GameManager {
 		if(gamerooms.containsKey(roomName)) return gamerooms.get(roomName);
 		else return null;
 	}
-	
+	/**
+	 * @return	a list of the games available.
+	 */
 	public String listGames() {
 		return gameList;
 	}
-	
+	/**
+	 * Get a player's {@link TBGPProtocolCallback} by his nickname.
+	 * @param nick	the player's nickname
+	 * @return	the player's {@link TBGPProtocolCallback}
+	 */
 	public TBGPProtocolCallback getCallback(String nick){
 		return players.get(nick);
 	}
-	
+	/**
+	 * Add all available games to the game list.
+	 * @param jsonPaths		an array containing JSON file paths that contain necessary objects for each game.
+	 */
 	public void initialize(String[] jsonPaths) {
 		games.put("BLUFFER", new GameProtocolFactory() {
 			
