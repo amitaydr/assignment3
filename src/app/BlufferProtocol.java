@@ -113,7 +113,7 @@ public class BlufferProtocol implements GameProtocol {
 								scoreBoard = scoreBoard + ", " + gameRoom.playerNickname(k) + ": " + v + "pts";
 							});
 							scoreBoard = scoreBoard.substring(2); //To not include the first comma
-							gameRoom.broadcast("Summary: " + scoreBoard, TBGPCommand.ASKTXT);
+							gameRoom.broadcast("Summary: " + scoreBoard, TBGPCommand.GAMEMSG);
 							gameRoom.endGame();
 						}
 					}
