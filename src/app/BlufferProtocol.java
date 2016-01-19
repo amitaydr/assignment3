@@ -12,7 +12,11 @@ import tokenizer.TBGPMessage;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
+/**
+ * The BlufferProtocol class implements the GameProtocol interface.
+ * In practice, the BlufferProtocl class is the set of game rules for the Bluffer game.
+ * This class handles user messages and commands within the {@link GameRoom}, once the Bluffer game was started.
+ */
 public class BlufferProtocol implements GameProtocol {
 	
 	private BlufferState gameState = BlufferState.INITIALIZING;
@@ -32,7 +36,11 @@ public class BlufferProtocol implements GameProtocol {
 	private HashMap<TBGPProtocolCallback, Integer> currentRoundScore;
 	
 	private HashMap<TBGPProtocolCallback, Boolean> wasCorrect;
-	
+	/**
+	 * The BlufferProtocol constructor.
+	 * @param jsonPath	The path of the JSON file containing the game questions.
+	 * @param gameroom	The {@link GameRoom} in which the Bluffer game is initialized.
+	 */
 	public BlufferProtocol(String jsonPath, GameRoom gameroom) {
 		this.gameRoom = gameroom;
 		scores = new HashMap<TBGPProtocolCallback, Integer>();
@@ -41,8 +49,13 @@ public class BlufferProtocol implements GameProtocol {
 		playerCounter = gameRoom.numOfPlayers();
 		initialize(jsonPath);
 	}
-
+	
 	@Override
+	/**
+	 * Receives commands and messages sent from the players, processes them and responds accordingly.
+	 * @param msg	The {@link TBGPMessage} sent by a player.
+	 * @param callback	The player {@link TBGPProtocolCallback}. Used to send responses.
+	 */
 	public synchronized void processMessage(TBGPMessage msg, TBGPProtocolCallback callback) {
 		switch(gameState) {
 			case INITIALIZING:
@@ -122,7 +135,10 @@ public class BlufferProtocol implements GameProtocol {
 		}
 
 	}
-
+	/**
+	 * Initializes the Bluffer game. Reads the questions from the JSON file,
+	 * initializes players list and scores and starts the game.
+	 */
 	@Override
 	public void initialize(String jsonPath) {
 		JsonParser parser = new JsonParser();
@@ -152,12 +168,6 @@ public class BlufferProtocol implements GameProtocol {
 			currentRoundScore.put(i, 0);
 			wasCorrect.put(i, false);
 		});
-	}
-	//TODO For testing - need to erase before submission
-	public void printQuestions (){
-		for (int i = 0; i<questions.length; i++){
-			System.out.println(questions[i].getQuestion());
-		}
 	}
 
 }
