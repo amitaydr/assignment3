@@ -207,7 +207,12 @@ public class ConnectionHandler<T> {
 	public ProtocolCallback<T> getCallbackProtocol() {
 		return _callback;
 	}
-
+	
+	/**
+	 * used by the callback to add a message to be sent to the client when possible
+	 * @param msg message to send
+	 * @throws CharacterCodingException 
+	 */
 	public void addOutMessage(T msg) throws CharacterCodingException {
 		addOutData (_tokenizer.getBytesForMessage(msg));
 		

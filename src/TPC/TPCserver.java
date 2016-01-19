@@ -113,7 +113,7 @@ public class TPCserver<T> implements Runnable {
 		 }
 		 
 		int port = Integer.decode(args[0]).intValue();
-		String[] jsonPaths = {"jsonExample/" + args[1] + ".json"};
+		String[] jsonPaths = {args[1] + ".json"};
         GameManager.getInstance().initialize(jsonPaths);
 		
 		TPCserver<TBGPMessage> server = new TPCserver<TBGPMessage>(port, new ServerProtocolFactory<TBGPMessage>() {
