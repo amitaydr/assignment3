@@ -151,7 +151,7 @@ public class BlufferProtocol implements GameProtocol {
 			for(int i=0; i<jquestions.size(); i++){
 				JsonObject q = jquestions.get(i).getAsJsonObject();
 				String questionText = q.get("questionText:").getAsString();
-				String realAnswer = q.get("realAnswer:").getAsString();
+				String realAnswer = q.get("realAnswer:").getAsString().toLowerCase();
 				tempQuestions.add(new BlufferQuestion(questionText,realAnswer));
 			}
 			for (int j=0; j<3; j++){

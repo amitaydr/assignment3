@@ -29,18 +29,15 @@ public class GameRoom {
 	/**
 	 * Starts a game within the game room with all the players in it at the time.
 	 * @param gameName	the name of the game to start
-	 * @return	true if the game was successfully started, false otherwise.
 	 */
-	public synchronized boolean startGame(String gameName) {
+	public synchronized void startGame(String gameName) {
 		if(!inSession()) {
 			GameProtocol game = GameManager.getInstance().searchGame(gameName).create(this);
 			//to take care of game is null
 			this.currentGame = game;
 			logger.info(gameName + " game starting");
-			return true;
 		} else {
 			logger.info("A different game is already in session");
-			return false;
 		}
 	}
 	/**

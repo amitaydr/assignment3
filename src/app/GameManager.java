@@ -75,7 +75,7 @@ public class GameManager {
 	 * @param nickname	the nickname of the player to delete
 	 */
 	public void exit(String nickname) {
-		if(players.containsKey(nickname)) {
+		if(nickname != null && players.containsKey(nickname)) {
 			players.remove(nickname);
 			logger.info(nickname + " logged off");
 		} else logger.info(nickname + " does not exist");

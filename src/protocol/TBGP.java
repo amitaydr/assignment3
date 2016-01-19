@@ -55,23 +55,20 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 						callback.sendMessage(new TBGPMessage("MSG REJECTED you need to join a room first! use JOIN <room_name> command",TBGPCommand.SYSMSG));
 						break;
 					}
+					callback.sendMessage(new TBGPMessage("MSG ACCEPTED",TBGPCommand.SYSMSG));
 					gameRoom.broadcast(nickname + ": "+ msg.getMessage(), TBGPCommand.USRMSG);
 					break;
 				case QUIT:
-					System.out.println("got quit message TBGP"); // TODO to delete
 					if (gameRoom != null){
 						boolean ansQuit = gameRoom.quit((TBGPProtocolCallback)callback);
 						if (ansQuit){
-							System.out.println("ansQuit = true"); // TODO to delete
 							GameManager.getInstance().exit(nickname);
 							shouldClose = true;
 							callback.sendMessage(new TBGPMessage("QUIT ACCEPTED bye bye", TBGPCommand.SYSMSG));
 						}else{
-							System.out.println("ansQuit = false"); // TODO to delete
 							callback.sendMessage(new TBGPMessage("QUIT REJECTED cannot leave before game is over!", TBGPCommand.SYSMSG));
 						}	
 					} else{
-						System.out.println("gameroom = null"); // TODO to delete
 						GameManager.getInstance().exit(nickname);
 						shouldClose = true;
 						callback.sendMessage(new TBGPMessage("QUIT ACCEPTED bye bye", TBGPCommand.SYSMSG));
@@ -87,8 +84,8 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 					break;
 				case STARTGAME:
 					if (gameRoom != null && !gameRoom.inSession()){
-						boolean ansStart = gameRoom.startGame(msg.getMessage());
-						callback.sendMessage(new TBGPMessage("STARTGAME "+(ansStart? "ACCEPTED":"REJECTED") ,TBGPCommand.SYSMSG));
+						callback.sendMessage(new TBGPMessage("STARTGAME ACCEPTED" ,TBGPCommand.SYSMSG));
+						gameRoom.startGame(msg.getMessage());
 					}else{
 						callback.sendMessage(new TBGPMessage("STARTGAME REJECTED not in gameRoom or other game in session" ,TBGPCommand.SYSMSG));
 					}
@@ -118,7 +115,6 @@ public  class TBGP implements AsyncServerProtocol<TBGPMessage> {
 
 	@Override
 	public void connectionTerminated() {
-		System.out.println("connection terminated"); // TODO to delete
 		gameRoom.quit(GameManager.getInstance().getCallback(nickname));
 		GameManager.getInstance().exit(nickname);
 		this.connectionTerminated  = true;
